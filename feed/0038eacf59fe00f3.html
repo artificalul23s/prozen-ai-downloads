@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chainx — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080810;
+      --panel: #14141f;
+      --panel-2: #191927;
+      --line: rgba(255,255,255,.075);
+      --text: #f7f7fc;
+      --muted: #9999ab;
+      --purple: #6945ff;
+      --purple-light: #a68aff;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      overflow: hidden;
+      background: #85838e;
+      color: var(--text);
+      font-family: "Manrope", sans-serif;
+      font-size: 12px;
+      user-select: none;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    .shell {
+      width: min(1200px, calc(100% - 42px));
+      height: calc(100% - 28px);
+      min-width: 980px;
+      margin: 14px auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 23px;
+      background: var(--bg);
+      box-shadow: 0 22px 70px rgba(0,0,0,.30), inset 0 1px rgba(255,255,255,.08);
+      transition: filter .22s, background .2s;
+    }
+    .glass {
+      backdrop-filter: blur(18px);
+      background: rgba(23,23,36,.84);
+      border: 1px solid rgba(255,255,255,.075);
+      box-shadow: inset 0 1px rgba(255,255,255,.055), 0 8px 24px rgba(0,0,0,.12);
+    }
+    .browser-bar {
+      height: 39px;
+      flex: 0 0 39px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 0 14px;
+      background: #101019;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .traffic { display:flex; gap:7px; align-items:center; }
+    .traffic i { width:9px;height:9px;border-radius:50%;display:block;box-shadow:0 0 8px rgba(0,0,0,.3); }
+    .traffic i:nth-child(1){background:#ff625e}.traffic i:nth-child(2){background:#ffc34e}.traffic i:nth-child(3){background:#42c96f}
+    .address {
+      height: 23px;
+      width: 42%;
+      max-width: 440px;
+      margin: 0 auto;
+      border-radius: 7px;
+      background: #282830;
+      color: #d9d9e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: .01em;
+    }
+    .browser-tools { display:flex;align-items:center;gap:14px;color:#c8c8d1; }
+    .browser-tools button { background: none;border:0;padding:2px;display:flex; }
+    .market-strip {
+      flex: 0 0 39px;
+      height: 39px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: hidden;
+      background: #181824;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .market-status { display:flex;align-items:center;gap:8px;color:#e3e3ec;font-size:10px;min-width:170px; }
+    .market-status .dot { width:7px;height:7px;border-radius:50%;background:#a58bff;box-shadow:0 0 10px #9371ff; }
+    .market-view { background:#f0eff5;color:#171722;border:0;border-radius:7px;padding:5px 10px;font-size:9px;font-weight:800; }
+    .ticker-track { display:flex;align-items:center;gap:19px;overflow:hidden;flex:1; }
+    .ticker {
+      display:flex;align-items:center;gap:7px;
+      font-size:10px;color:#eeeeF6;white-space:nowrap;
+      padding:4px 2px;border-radius:8px;
+      transition:background .15s;
+    }
+    .ticker:hover { background:rgba(255,255,255,.07); }
+    .coin { width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:800;color:white; }
+    .ticker small { font-size:8px;color:#8d8d9f; }
+    .ticker .gain { color:#43d69a; font-size:8px; }
+    .ticker .loss { color:#f06f88; font-size:8px; }
+    .app-toolbar {
+      height: 65px;
+      flex: 0 0 65px;
+      display: grid;
+      grid-template-columns: 230px minmax(0,1fr);
+      background: #0e0e17;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand-area {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 19px 0 23px;
+      border-right:1px solid var(--line);
+    }
+    .brand { display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;letter-spacing:-.05em; }
+    .brand-mark { width:27px;height:27px; }
+    .icon-btn {
+      display:grid;place-items:center;
+      width:37px;height:37px;border-radius:11px;
+      border:1px solid rgba(255,255,255,.07);
+      background:linear-gradient(145deg,#20202f,#171722);
+      color:#d9d9e7;
+      box-shadow:inset 0 1px rgba(255,255,255,.045);
+      transition:transform .15s,background .15s,border-color .15s;
+    }
+    .icon-btn:hover { background:#29293b;border-color:rgba(255,255,255,.15);transform:translateY(-1px); }
+    .toolbar-right { display:flex;align-items:center;gap:12px;padding:0 18px;min-width:0; }
+    .balance-label { color:#d7d7e2;font-weight:600;white-space:nowrap;margin-right:0; }
+    .balance-pill {
+      height:37px;display:flex;align-items:center;gap:9px;padding:0 11px;
+      background:#191924;border:1px solid rgba(255,255,255,.08);
+      border-radius:11px;color:#f3f2fb;font-weight:700;white-space:nowrap;
+    }
+    .balance-pill strong { font-size:12px; }
+    .primary-btn,.secondary-btn {
+      height:37px;padding:0 14px;border-radius:11px;border:1px solid rgba(255,255,255,.08);
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      font-weight:700;white-space:nowrap;transition:transform .15s,filter .15s,background .15s;
+    }
+    .primary-btn { background:linear-gradient(135deg,#7b4dff,#5c38ef);box-shadow:0 5px 16px rgba(94,58,245,.18); }
+    .secondary-btn { background:linear-gradient(145deg,#20202e,#171722);color:#e8e8f0; }
+    .primary-btn:hover,.secondary-btn:hover { transform:translateY(-1px);filter:brightness(1.12); }
+    .toolbar-spacer { flex:1;min-width:10px; }
+    .search-wrap {
+      width:min(225px,24%);height:37px;display:flex;align-items:center;gap:8px;padding:0 10px;
+      border:1px solid rgba(255,255,255,.08);border-radius:11px;background:#171722;color:#9797a8;
+    }
+    .search-wrap input { width:100%;outline:none;background:transparent;color:#ededf4;border:0;font-size:10px;min-width:0; }
+    .search-wrap input::placeholder { color:#9696a7; }
+    .shortcut { padding:3px 5px;border-radius:5px;background:#242431;color:#c6c6d1;font-size:9px;white-space:nowrap; }
+    .toolbar-divider { width:1px;height:26px;background:var(--line); }
+    .user-btn { height:37px;padding:0 11px;border-radius:11px;background:#191924;border:1px solid var(--line);font-size:10px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap; }
+    .workspace { flex:1;min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr); }
+    .sidebar {
+      display:flex;flex-direction:column;min-height:0;
+      background:#0d0d16;border-right:1px solid var(--line);
+      transition:width .2s;
+    }
+    .side-nav { padding:17px 12px 12px; }
+    .nav-btn {
+      width:100%;height:34px;border:0;background:transparent;border-radius:9px;
+      display:flex;align-items:center;gap:11px;padding:0 12px;color:#b7b7c5;
+      text-align:left;font-size:11px;margin:0 0 5px;position:relative;
+    }
+    .nav-btn svg { flex:0 0 15px;opacity:.88; }
+    .nav-btn:hover { background:rgba(255,255,255,.055);color:white; }
+    .nav-btn.active { color:white;background:#222232;box-shadow:inset 0 1px rgba(255,255,255,.04); }
+    .nav-btn.active:before { content:"";position:absolute;left:-12px;top:7px;height:19px;width:3px;border-radius:0 4px 4px 0;background:#7857ff; }
+    .nav-chevron { margin-left:auto;transition:transform .2s; }
+    .nav-chevron.closed { transform:rotate(-90deg); }
+    .subnav { margin:0 0 8px 24px;padding-left:11px;border-left:1px solid #343442;overflow:hidden;transition:max-height .2s; }
+    .subnav button { display:block;width:100%;padding:6px 8px;background:none;border:0;text-align:left;color:#aaaab9;font-size:10px; }
+    .subnav button:hover { color:#fff; }
+    .side-bottom { margin-top:auto; }
+    .side-section { border-top:1px solid var(--line);padding:13px 12px; }
+    .upgrade-card {
+      margin:4px 4px 5px;padding:11px 12px;border:1px solid rgba(153,126,255,.2);border-radius:12px;
+      background:radial-gradient(130% 120% at 0% 0%,rgba(116,76,255,.31),transparent 65%),#171521;
+      display:flex;align-items:center;gap:11px;cursor:pointer;
+    }
+    .upgrade-card:hover { border-color:rgba(177,154,255,.5); }
+    .upgrade-card b { display:block;font-size:10px;margin-bottom:2px; }
+    .upgrade-card small { display:block;font-size:8px;color:#aaa4c0; }
+    .theme-row { display:flex;align-items:center;gap:9px;height:31px;padding:0 12px;color:#b8b8c5;font-size:10px; }
+    .switch { margin-left:auto;width:27px;height:16px;border-radius:20px;background:#6845ff;position:relative;border:0;transition:background .2s; }
+    .switch:after { content:"";position:absolute;width:11px;height:11px;top:2.5px;right:2px;border-radius:50%;background:white;transition:all .2s; }
+    .switch.off { background:#454554; }
+    .switch.off:after { right:14px; }
+    .main-content { min-width:0;min-height:0;padding:15px 17px 17px;display:grid;grid-template-rows:48px minmax(250px,1.18fr) minmax(195px,.92fr);gap:11px;overflow:auto; }
+    .page-heading { display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0; }
+    .page-heading h1 { margin:0 0 3px;font-size:17px;line-height:1.1;font-weight:800;letter-spacing:-.035em; }
+    .page-heading p { margin:0;color:#a0a0b0;font-size:10px;white-space:nowrap; }
+    .heading-actions { display:flex;align-items:center;gap:8px; }
+    .small-btn { height:35px;padding:0 11px;border-radius:10px;font-size:10px; }
+    .range-select {
+      height:35px;padding:0 10px;border-radius:10px;background:#1a1a27;color:#f2f2f8;
+      border:1px solid rgba(255,255,255,.08);outline:0;font-weight:700;font-size:10px;
+    }
+    .top-grid { display:grid;grid-template-columns:minmax(225px,.78fr) minmax(0,1.62fr);gap:11px;min-height:0; }
+    .bottom-grid { display:grid;grid-template-columns:minmax(0,1.95fr) minmax(230px,.93fr);gap:11px;min-height:0; }
+    .card { min-width:0;min-height:0;position:relative;overflow:hidden;background:var(--panel);border:1px solid rgba(255,255,255,.075);border-radius:14px;box-shadow:inset 0 1px rgba(255,255,255,.025),0 5px 16px rgba(0,0,0,.08); }
+    .asset-card { padding:16px 16px 13px;display:flex;flex-direction:column; }
+    .card-title { color:#e7e7ef;font-weight:700;font-size:10px;display:flex;align-items:center;gap:6px; }
+    .info-button { width:14px;height:14px;padding:0;display:grid;place-items:center;border:1px solid #5b5b6a;color:#b6b6c5;border-radius:50%;font-size:9px;background:none; }
+    .big-number { margin-top:17px;font-weight:800;letter-spacing:-.045em;font-size:28px;line-height:1;white-space:nowrap; }
+    .big-number span { color:#9a9aab;font-size:.8em; }
+    .gain-row { display:flex;align-items:center;gap:7px;margin-top:9px;font-size:9px;color:#ceced8;white-space:nowrap; }
+    .gain-badge { padding:3px 6px;border-radius:5px;background:rgba(36,182,116,.15);color:#57d699;font-size:8px;font-weight:800; }
+    .distribution-title { margin:18px 0 7px;font-size:10px;font-weight:700;color:#e8e8ef; }
+    .distribution-bar { height:12px;display:flex;gap:3px;margin-bottom:9px; }
+    .distribution-bar span { display:block;border-radius:3px; }
+    .distribution-bar span:nth-child(1){background:linear-gradient(90deg,#653cff,#8e65ff)}
+    .distribution-bar span:nth-child(2){background:#a07aff}
+    .distribution-bar span:nth-child(3){background:#e0d7ff}
+    .asset-list { display:flex;flex-direction:column;gap:1px; }
+    .asset-row { width:100%;display:grid;grid-template-columns:11px minmax(0,1fr) auto;align-items:center;gap:8px;border:0;background:transparent;text-align:left;padding:5px 0;color:#eeeef5;border-radius:6px; }
+    .asset-row:hover { background:rgba(255,255,255,.04); }
+    .asset-dot { width:8px;height:8px;border-radius:50%;background:#875dff; }
+    .asset-row:nth-child(2) .asset-dot { background:#a08aff; }
+    .asset-row:nth-child(3) .asset-dot { background:#e3d9ff; }
+    .asset-name { font-size:10px;font-weight:700; }
+    .asset-percent { display:block;color:#9999aa;font-size:9px;margin-top:2px;font-weight:500; }
+    .asset-value { font-size:9px;white-space:nowrap;color:#e1e1eb; }
+    .invest-card { padding:16px 15px 9px;display:flex;flex-direction:column; }
+    .invest-header { display:flex;align-items:flex-start;justify-content:space-between;gap:10px; }
+    .invest-total { margin-top:15px;font-size:24px;line-height:1;font-weight:800;letter-spacing:-.04em;white-space:nowrap; }
+    .invest-total span { color:#9a9aab;font-size:.78em; }
+    .chart-tools { display:flex;gap:7px;align-items:center; }
+    .chart-tools .icon-btn { width:35px;height:35px; }
+    .chart-tools .selected { background:#29243e;color:#c2adff;border-color:#4b3b81; }
+    .chart-wrap { min-height:0;flex:1;position:relative;margin-top:3px; }
+    .chart-svg { width:100%;height:100%;display:block;overflow:visible; }
+    .chart-tip {
+      position:absolute;right:13%;top:12px;background:#222233;border:1px solid rgba(255,255,255,.1);
+      border-radius:9px;padding:8px 10px;font-size:8px;line-height:1.6;color:#d9d9e5;
+      box-shadow:0 8px 25px rgba(0,0,0,.22);pointer-events:none;z-index:2;min-width:120px;
+    }
+    .tip-year { color:#a9a9b9;margin-bottom:2px; }
+    .tip-row { display:flex;align-items:center;gap:6px;white-space:nowrap; }
+    .tip-dot { width:5px;height:5px;border-radius:50%;background:#9072ff; }
+    .tip-row:nth-child(3) .tip-dot { background:#c2b1ff; }
+    .profit-card { padding:16px 16px 10px;display:flex;flex-direction:column; }
+    .profit-top { display:flex;justify-content:space-between;align-items:flex-start; }
+    .profit-number { font-size:21px;font-weight:800;letter-spacing:-.035em;margin-top:12px; }
+    .profit-number span { color:#9b9baa;font-size:.78em; }
+    .profit-legend { display:flex;gap:15px;align-items:center;margin-top:14px;color:#d5d5df;font-size:9px;white-space:nowrap; }
+    .legend-item { display:flex;align-items:center;gap:6px; }
+    .legend-item i { display:block;width:3px;height:11px;border-radius:3px;background:#8059ff; }
+    .legend-item:nth-child(2) i { background:#b094ff; }
+    .legend-item:nth-child(3) i { background:#ddd7ef; }
+    .profit-chart { min-height:0;flex:1;display:flex;align-items:flex-end;justify-content:space-around;gap:10px;padding:3px 7px 0; }
+    .year-column { height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;cursor:pointer; }
+    .column-value { font-size:8px;color:#dedee8;white-space:nowrap; }
+    .stack { width:100%;max-width:38px;height:var(--h);display:flex;flex-direction:column-reverse;gap:3px;align-items:stretch; }
+    .stack span { display:block;border-radius:2px 2px 0 0; }
+    .stack span:nth-child(1){background:linear-gradient(90deg,#5d39ed,#744dff)}
+    .stack span:nth-child(2){background:#282145}
+    .stack span:nth-child(3){background:#b39aff}
+    .year-label { font-size:9px;color:#a8a8b6; }
+    .year-column:hover .year-label { color:white; }
+    .advisor-card {
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;
+      padding:15px 15px 14px;
+      background:
+        radial-gradient(95% 56% at 50% 100%,rgba(82,40,244,.76),transparent 78%),
+        radial-gradient(75% 58% at 50% 86%,rgba(97,55,255,.28),transparent 80%),#151522;
+    }
+    .advisor-orbit { position:absolute;inset:0;pointer-events:none;opacity:.55; }
+    .advisor-orbit i { position:absolute;width:12px;height:12px;background:rgba(164,164,195,.14);border-radius:2px; }
+    .advisor-orbit i:nth-child(1){top:9%;left:7%}.advisor-orbit i:nth-child(2){top:20%;left:14%}
+    .advisor-orbit i:nth-child(3){top:12%;right:10%}.advisor-orbit i:nth-child(4){top:24%;right:18%}
+    .advisor-orbit i:nth-child(5){top:5%;right:31%}.advisor-orbit i:nth-child(6){top:22%;left:30%}
+    .robot-badge { position:absolute;top:17px;left:50%;transform:translateX(-50%);height:50px;width:50px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#724cff,#3e20ae);border:1px solid rgba(255,255,255,.22);box-shadow:0 0 24px rgba(101,65,255,.4); }
+    .advisor-copy { position:relative;z-index:1;margin-top:auto; }
+    .advisor-copy h2 { font-size:14px;line-height:1.35;margin:0 0 7px;font-weight:800;letter-spacing:-.02em; }
+    .advisor-copy p { color:#b4adc9;font-size:9px;line-height:1.55;margin:0 auto 15px;max-width:220px; }
+    .advisor-btn { width:100%;height:32px;border-radius:9px;background:rgba(255,255,255,.055);border:1px solid rgba(218,204,255,.2);font-size:9px;font-weight:700;position:relative;z-index:1; }
+    .advisor-btn:hover { background:rgba(255,255,255,.13); }
+    .toast {
+      position:fixed;z-index:30;left:50%;bottom:28px;transform:translate(-50%,18px);
+      padding:10px 15px;border-radius:10px;background:#242435;border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 10px 35px rgba(0,0,0,.35);color:#f3f3f8;font-size:11px;opacity:0;pointer-events:none;transition:.22s;
+    }
+    .toast.show { opacity:1;transform:translate(-50%,0); }
+    .popover { position:fixed;z-index:20;display:none;width:245px;padding:12px;border-radius:13px;background:#20202e;border:1px solid rgba(255,255,255,.11);box-shadow:0 15px 40px rgba(0,0,0,.38); }
+    .popover.open { display:block; }
+    .popover h3 { margin:0 0 8px;font-size:11px; }
+    .pop-item { padding:8px 0;border-top:1px solid var(--line);font-size:9px;color:#c7c7d3;line-height:1.45; }
+    .modal-backdrop { position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(5,5,12,.66);backdrop-filter:blur(6px); }
+    .modal-backdrop.open { display:flex; }
+    .modal {
+      width:min(390px,92vw);padding:21px;border-radius:17px;background:#191925;border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 25px 80px rgba(0,0,0,.52);animation:pop .16s ease-out;
+    }
+    @keyframes pop { from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none} }
+    .modal-head { display:flex;justify-content:space-between;align-items:center;margin-bottom:6px; }
+    .modal-head h2 { margin:0;font-size:17px;letter-spacing:-.03em; }
+    .modal-description { margin:0 0 16px;color:#a4a4b4;font-size:10px;line-height:1.6; }
+    .modal-field { display:block;margin:12px 0;color:#c7c7d4;font-size:10px; }
+    .modal-field input,.modal-field select { display:block;width:100%;margin-top:6px;padding:10px 11px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:#10101a;color:#f5f5fb;outline:none; }
+    .modal-field input:focus,.modal-field select:focus { border-color:#7655ff; }
+    .modal-actions { display:flex;justify-content:flex-end;gap:8px;margin-top:17px; }
+    .modal-actions button { height:35px;padding:0 14px;border-radius:9px; }
+    .light-theme { --bg:#f2f1f8;--panel:#fff;--panel-2:#f5f4fb;--line:rgba(21,20,37,.12);--text:#20202d;--muted:#747487; }
+    .light-theme { color:#20202d;background:var(--bg); }
+    .light-theme .app-toolbar,.light-theme .sidebar,.light-theme .browser-bar { background:#f1f0f7; }
+    .light-theme .market-strip { background:#e8e7f0; }
+    .light-theme .brand-area,.light-theme .sidebar { border-color:rgba(20,20,35,.12); }
+    .light-theme .nav-btn { color:#555568; }
+    .light-theme .nav-btn.active { background:#e1def1;color:#29243b; }
+    .light-theme .card { background:#fff;border-color:rgba(30,25,55,.12); }
+    .light-theme .card-title,.light-theme .asset-name,.light-theme .page-heading h1,.light-theme .profit-number { color:#252435; }
+    .light-theme .secondary-btn,.light-theme .balance-pill,.light-theme .search-wrap,.light-theme .user-btn,.light-theme .range-select { background:#e9e8f1;color:#282737;border-color:rgba(30,25,55,.1); }
+    .light-theme .search-wrap input { color:#292838; }
+    .light-theme .toolbar-right,.light-theme .brand-area { color:#252435; }
+    .light-theme .sidebar .theme-row { color:#555568; }
+    .light-theme .asset-value,.light-theme .profit-legend,.light-theme .legend-item { color:#48485a; }
+    .light-theme .advisor-card { color:#fff; }
+    .flash { animation:flash .35s ease-out; }
+    @keyframes flash { 0%{filter:brightness(2.1)}100%{filter:none} }
+    .sidebar.collapsed { width:70px; }
+    .sidebar.collapsed .side-label,.sidebar.collapsed .subnav,.sidebar.collapsed .upgrade-card .upgrade-copy,.sidebar.collapsed .nav-chevron,.sidebar.collapsed .theme-label { display:none; }
+    .sidebar.collapsed .side-nav { padding-left:12px;padding-right:12px; }
+    .sidebar.collapsed .nav-btn { justify-content:center;padding:0; }
+    .sidebar.collapsed .upgrade-card { justify-content:center;padding:11px 5px; }
+    .shell.sidebar-collapsed { grid-template-columns:70px minmax(0,1fr); }
+    .shell.sidebar-collapsed .app-toolbar { grid-template-columns:70px minmax(0,1fr); }
+    .shell.sidebar-collapsed .brand-area { padding:0 20px; }
+    .shell.fullscreen { position:fixed;inset:0;width:100%;height:100%;margin:0;max-width:none;border-radius:0;z-index:10; }
+    .added-widget { position:absolute;z-index:5;right:18px;top:14px;padding:6px 9px;background:#29213f;border:1px solid #6852ad;border-radius:8px;font-size:9px;color:#d9ccff;box-shadow:0 4px 14px rgba(0,0,0,.2); }
+    @media (max-width:1050px) {
+      .shell { width:calc(100% - 16px); }
+      .app-toolbar,.workspace { grid-template-columns:205px minmax(0,1fr); }
+      .brand-area { padding-left:15px;padding-right:13px; }
+      .toolbar-right { gap:8px;padding:0 11px; }
+      .sidebar { border-right:1px solid var(--line); }
+      .main-content { padding-left:12px;padding-right:12px; }
+      .top-grid { grid-template-columns:minmax(215px,.78fr) minmax(0,1.62fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="shell">
+    <header class="browser-bar">
+      <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+      <button class="text-slate-400 hover:text-white bg-transparent border-0 p-1" aria-label="Panou browser" title="Panou browser">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M5.5 7h.1M5.5 10h.1"/></svg>
+      </button>
+      <button class="text-slate-400 hover:text-white bg-transparent border-0 p-1" aria-label="Înapoi" title="Înapoi"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button class="text-slate-400 hover:text-white bg-transparent border-0 p-1" aria-label="Înainte" title="Înainte"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+      <div class="address">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 3.5 5.5v6c0 5.2 3.6 9.9 8.5 11 4.9-1.1 8.5-5.8 8.5-11v-6L12 2Zm0 3.1 5.5 2.2v4.2c0 3.8-2.3 7.3-5.5 8.5V5.1Z"/></svg>
+        <span>chainx.com/dashboard</span>
+        <svg style="position:absolute;right:calc(50% - 205px)" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg>
+      </div>
+      <div class="browser-tools">
+        <button title="Distribuie" aria-label="Distribuie"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3m-4 4 4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg></button>
+        <button title="Filă nouă" aria-label="Filă nouă"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button title="Copiere filă" aria-label="Copiere filă"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
+      </div>
+    </header>
+
+    <div class="market-strip">
+      <button class="market-status bg-transparent border-0 p-0" id="marketToggle" title="Schimbă starea pieței">
+        <span class="dot" id="marketDot"></span><span id="marketText">Piața este deschisă</span>
+      </button>
+      <button class="market-view" id="marketView">Vezi tot</button>
+      <div class="ticker-track" id="tickerTrack">
+        <button class="ticker" data-symbol="AAPL"><span class="coin" style="background:#252633">●</span><b>AAPL</b><small>⌁⌁⌁</small><span class="gain">+0,48%</span></button>
+        <button class="ticker" data-symbol="TSLA"><span class="coin" style="background:#ee3d48">T</span><b>TSLA</b><small>⌁⌁</small><span class="gain">+2,20%</span></button>
+        <button class="ticker" data-symbol="NKE"><span class="coin" style="background:#252633">✓</span><b>NKE</b><small>⌁⌁⌁</small><span class="loss">−0,72%</span></button>
+        <button class="ticker" data-symbol="META"><span class="coin" style="background:#355bde">∞</span><b>META</b><small>⌁⌁</small><span class="gain">+0,31%</span></button>
+        <button class="ticker" data-symbol="NVDA"><span class="coin" style="background:#81bd22">◉</span><b>NVDA</b><small>⌁⌁⌁</small><span class="loss">−0,45%</span></button>
+        <button class="ticker" data-symbol="AMZN"><span class="coin" style="background:#eee;color:#333">a</span><b>AMZN</b><small>⌁⌁</small><span class="gain">+1,28%</span></button>
+      </div>
+      <button class="text-slate-400 hover:text-white bg-transparent border-0 p-1" id="tickerNext" aria-label="Ticker următor"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+
+    <div class="app-toolbar">
+      <div class="brand-area">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M16 2.5 19.4 10l7.2 3.2-7.2 3.3-3.4 7.4-3.3-7.4-7.3-3.3 7.3-3.2L16 2.5Z" fill="#F8F7FF"/>
+            <path d="m5 23 2.1-4.1 4.1-2.1-2.1 4.1L5 23Z" fill="#A98AFF"/>
+            <path d="m22 25 1.7-3.2 3.2-1.7-1.7 3.2L22 25Z" fill="#fff"/>
+            <path d="m24.3 5.1 1-2 2-1-1 2-2 1Z" fill="#A98AFF"/>
+          </svg>
+          <span>Chainx</span>
+        </div>
+        <button class="bg-transparent border-0 text-slate-400 hover:text-white p-1" id="collapseSide" aria-label="Restrânge meniul" title="Restrânge meniul">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 7-5 5 5 5M20 7l-5 5 5 5"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <span class="balance-label">Sold</span>
+        <button class="balance-pill" id="balanceButton" title="Adaugă fonduri">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b9b9c8" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 15h3"/></svg>
+          <strong id="balanceAmount">$25,760.98</strong>
+        </button>
+        <button class="icon-btn" id="addFunds" aria-label="Adaugă fonduri" title="Adaugă fonduri" style="background:linear-gradient(145deg,#7951ff,#5c34ed);color:white;border:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="icon-btn" id="transferBtn" aria-label="Transferă" title="Transferă">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </button>
+        <button class="icon-btn" id="refreshBtn" aria-label="Actualizează" title="Actualizează datele">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.5-3"/></svg>
+        </button>
+        <div class="toolbar-spacer"></div>
+        <label class="search-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="stockSearch" type="search" placeholder="Caută simboluri..." autocomplete="off">
+          <span class="shortcut">⌘ K</span>
+        </label>
+        <button class="icon-btn" id="notificationBtn" aria-label="Notificări" title="Notificări">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+          <i style="position:absolute;width:5px;height:5px;background:#9b7cff;border-radius:50%;margin:0 0 17px 18px;border:1px solid #191925"></i>
+        </button>
+        <div class="toolbar-divider"></div>
+        <button class="user-btn" id="userButton">Investor <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 9 6 6 6-6"/></svg></button>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <aside class="sidebar" id="sidebar">
+        <nav class="side-nav" aria-label="Navigare principală">
+          <button class="nav-btn active" data-page="Dashboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="side-label">Panou de control</span>
+          </button>
+          <button class="nav-btn" data-page="Market Summary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5m0 14h17M7 15l4-5 3 3 6-8"/><path d="M17 5h3v3"/></svg><span class="side-label">Piață</span>
+          </button>
+          <button class="nav-btn" id="portfolioNav" data-page="Portfolio">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></svg><span class="side-label">Portofoliu</span>
+            <svg class="nav-chevron" id="portfolioChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="subnav" id="portfolioSubnav">
+            <button data-page="Acțiuni">Acțiuni</button><button data-page="Obligațiuni">Obligațiuni</button><button data-page="Fonduri mutuale">Fonduri mutuale</button>
+          </div>
+          <button class="nav-btn" data-page="Analiză">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/></svg><span class="side-label">Analiză</span>
+          </button>
+          <button class="nav-btn" data-page="Portofel">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18m-5 5h2"/></svg><span class="side-label">Portofel</span>
+          </button>
+          <button class="nav-btn" data-page="Comunitate">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span class="side-label">Comunitate</span>
+          </button>
+        </nav>
+        <div class="side-bottom">
+          <div class="side-section">
+            <button class="nav-btn" id="settingsBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.1.8-1.1 1.9-1.3-.5a8 8 0 0 1-1.4.8l-.2 1.4h-2.2l-.3-1.4a8 8 0 0 1-1.5-.8l-1.2.5-1.1-1.9 1.1-.8a7 7 0 0 1 0-1.7l-1.1-.8 1.1-1.9 1.2.5a8 8 0 0 1 1.5-.8l.3-1.4h2.2l.2 1.4a8 8 0 0 1 1.4.8l1.3-.5 1.1 1.9-1.1.8a7 7 0 0 1 0 1.6Z" transform="translate(-3 -1)"/></svg><span class="side-label">Setări</span>
+            </button>
+            <button class="nav-btn" id="helpBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.7 1.2c-.8 1.2-2.3 1.4-2.3 3.1M12 17h.01"/></svg><span class="side-label">Ajutor și suport</span>
+            </button>
+          </div>
+          <div class="side-section">
+            <button class="upgrade-card" id="upgradeBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e2d8ff" stroke-width="1.6"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg>
+              <span class="upgrade-copy"><b>Fă upgrade</b><small>Deblochează toate funcțiile</small></span>
+            </button>
+          </div>
+          <div class="side-section" style="padding-top:8px;padding-bottom:11px">
+            <div class="theme-row">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg>
+              <span class="theme-label">Mod întunecat</span>
+              <button class="switch" id="themeSwitch" aria-label="Schimbă tema" aria-pressed="true"></button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="mainContent">
+        <div class="page-heading">
+          <div>
+            <h1 id="pageTitle">Panou de control</h1>
+            <p id="pageSubtitle">Bine ai revenit! Vezi cum evoluează investițiile tale.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="secondary-btn small-btn" id="addWidget">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>Adaugă widget
+            </button>
+            <select class="range-select" id="timeRange" aria-label="Interval grafic">
+              <option value="all">▣ &nbsp; Tot timpul</option>
+              <option value="1y">▣ &nbsp; 1 an</option>
+              <option value="6m">▣ &nbsp; 6 luni</option>
+              <option value="1m">▣ &nbsp; 1 lună</option>
+            </select>
+            <button class="primary-btn small-btn" id="buyAsset">Cumpără active</button>
+          </div>
+        </div>
+
+        <section class="top-grid" aria-label="Rezumat investiții">
+          <article class="card asset-card">
+            <div class="card-title">Active totale <button class="info-button" title="Valoarea totală estimată a portofoliului" aria-label="Despre active">i</button></div>
+            <div class="big-number" id="assetsTotal">$325,980<span>.65</span></div>
+            <div class="gain-row"><span class="gain-badge">↑ 12%</span><span id="assetGain">+$39,117.67 anul acesta</span></div>
+            <div class="distribution-title">Distribuție</div>
+            <div class="distribution-bar" aria-label="Distribuție active"><span style="width:65%"></span><span style="width:25%"></span><span style="width:10%"></span></div>
+            <div class="asset-list">
+              <button class="asset-row" data-asset="Acțiuni"><span class="asset-dot"></span><span class="asset-name">Acțiuni<span class="asset-percent">65%</span></span><span class="asset-value" id="stocksValue">$211,887.42</span></button>
+              <button class="asset-row" data-asset="Obligațiuni"><span class="asset-dot"></span><span class="asset-name">Obligațiuni<span class="asset-percent">25%</span></span><span class="asset-value" id="bondsValue">$81,495.16</span></button>
+              <button class="asset-row" data-asset="Fonduri mutuale"><span class="asset-dot"></span><span class="asset-name">Fonduri mutuale<span class="asset-percent">10%</span></span><span class="asset-value" id="fundsValue">$32,598.06</span></button>
+            </div>
+          </article>
+
+          <article class="card invest-card">
+            <div class="invest-header">
+              <div>
+                <div class="card-title">Investiții totale <button class="info-button" title="Valoarea investițiilor tale" aria-label="Despre investiții">i</button></div>
+                <div class="invest-total" id="investTotal">$270,560<span>.20</span></div>
+                <div class="gain-row" style="margin-top:8px"><span class="gain-badge">↑ 20%</span><span id="investGain">+$54,112.04 anul acesta</span></div>
+              </div>
+              <div class="chart-tools">
+                <button class="icon-btn selected" id="lineMode" title="Grafic linie" aria-label="Grafic linie">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17 8 12l4 3 8-9"/><path d="M14 6h6v6"/></svg>
+                </button>
+                <button class="icon-btn" id="chartSettings" title="Comută prezentarea" aria-label="Comută prezentarea">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 4v9m0 4v3M12 4v3m0 4v9m6-16v10m0 4v2"/><circle cx="6" cy="15" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="18" cy="16" r="2"/></svg>
+                </button>
+                <button class="icon-btn" id="captureBtn" title="Captură ecran" aria-label="Captură ecran">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+                </button>
+                <button class="icon-btn" id="fullscreenBtn" title="Ecran complet" aria-label="Ecran complet">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="chart-wrap" id="chartWrap">
+              <div class="chart-tip" id="chartTip">
+                <div class="tip-year">2024</div>
+                <div class="tip-row"><i class="tip-dot"></i> Acțiuni <span style="margin-left:auto">$39,056.02</span></div>
+                <div class="tip-row"><i class="tip-dot"></i> Obligațiuni <span style="margin-left:auto">$14,608.02</span></div>
+              </div>
+              <svg class="chart-svg" id="investmentChart" viewBox="0 0 620 230" preserveAspectRatio="none" role="img" aria-label="Evoluția investițiilor între 2018 și 2026">
+                <defs>
+                  <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9876ff" stop-opacity=".35"/><stop offset="1" stop-color="#7956ef" stop-opacity="0"/></linearGradient>
+                  <linearGradient id="barGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#bca9ff"/><stop offset="1" stop-color="#7654f4" stop-opacity=".12"/></linearGradient>
+                  <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <g font-family="Manrope, sans-serif" font-size="10" fill="#aaaab9">
+                  <text x="2" y="50">$150K</text><text x="2" y="94">$100K</text><text x="2" y="138">$50K</text><text x="27" y="181">0</text>
+                  <text x="56" y="216">2018</text><text x="124" y="216">2019</text><text x="192" y="216">2020</text><text x="260" y="216">2021</text>
+                  <text x="328" y="216">2022</text><text x="396" y="216">2023</text><text x="464" y="216" fill="#f5f3ff" font-weight="700">2024</text><text x="532" y="216">2025</text><text x="590" y="216">2026</text>
+                </g>
+                <g stroke="#353542" stroke-width="1" opacity=".6">
+                  <path d="M42 46H612"/><path d="M42 90H612"/><path d="M42 134H612"/><path d="M42 178H612"/>
+                </g>
+                <g id="chartBars" opacity=".6" fill="url(#barGradient)">
+                  <rect x="47" y="169" width="3" height="9"/><rect x="54" y="165" width="3" height="13"/><rect x="61" y="168" width="3" height="10"/><rect x="68" y="157" width="3" height="21"/><rect x="75" y="163" width="3" height="15"/><rect x="82" y="158" width="3" height="20"/><rect x="89" y="160" width="3" height="18"/><rect x="96" y="155" width="3" height="23"/><rect x="103" y="149" width="3" height="29"/><rect x="110" y="156" width="3" height="22"/><rect x="117" y="153" width="3" height="25"/><rect x="124" y="144" width="3" height="34"/><rect x="131" y="150" width="3" height="28"/><rect x="138" y="146" width="3" height="32"/><rect x="145" y="151" width="3" height="27"/><rect x="152" y="139" width="3" height="39"/><rect x="159" y="143" width="3" height="35"/><rect x="166" y="149" width="3" height="29"/><rect x="173" y="140" width="3" height="38"/><rect x="180" y="145" width="3" height="33"/><rect x="187" y="147" width="3" height="31"/><rect x="194" y="154" width="3" height="24"/><rect x="201" y="150" width="3" height="28"/><rect x="208" y="158" width="3" height="20"/><rect x="215" y="151" width="3" height="27"/><rect x="222" y="155" width="3" height="23"/><rect x="229" y="152" width="3" height="26"/><rect x="236" y="159" width="3" height="19"/><rect x="243" y="146" width="3" height="32"/><rect x="250" y="142" width="3" height="36"/><rect x="257" y="150" width="3" height="28"/><rect x="264" y="151" width="3" height="27"/><rect x="271" y="147" width="3" height="31"/><rect x="278" y="154" width="3" height="24"/><rect x="285" y="149" width="3" height="29"/><rect x="292" y="145" width="3" height="33"/><rect x="299" y="151" width="3" height="27"/><rect x="306" y="139" width="3" height="39"/><rect x="313" y="144" width="3" height="34"/><rect x="320" y="147" width="3" height="31"/><rect x="327" y="142" width="3" height="36"/><rect x="334" y="136" width="3" height="42"/><rect x="341" y="146" width="3" height="32"/><rect x="348" y="139" width="3" height="39"/><rect x="355" y="145" width="3" height="33"/><rect x="362" y="132" width="3" height="46"/><rect x="369" y="137" width="3" height="41"/><rect x="376" y="141" width="3" height="37"/><rect x="383" y="133" width="3" height="45"/><rect x="390" y="139" width="3" height="39"/><rect x="397" y="143" width="3" height="35"/><rect x="404" y="135" width="3" height="43"/><rect x="411" y="141" width="3" height="37"/><rect x="418" y="147" width="3" height="31"/><rect x="425" y="136" width="3" height="42"/><rect x="432" y="140" width="3" height="38"/><rect x="439" y="144" width="3" height="34"/><rect x="446" y="150" width="3" height="28"/><rect x="453" y="143" width="3" height="35"/><rect x="460" y="155" width="3" height="23"/><rect x="467" y="160" width="3" height="18"/><rect x="474" y="151" width="3" height="27"/>
+                </g>
+                <path id="chartArea" d="M46 127 L58 113 L69 119 L81 91 L92 99 L105 82 L117 86 L130 65 L143 51 L155 69 L168 83 L181 97 L193 118 L206 108 L219 111 L232 104 L245 110 L258 106 L271 129 L283 147 L296 110 L309 120 L322 97 L334 69 L347 87 L359 52 L372 29 L384 58 L397 45 L409 72 L422 37 L434 81 L447 90 L459 75 L472 92 L484 134 L496 96 L509 111 L521 129 L534 121 L547 106 L559 126 L572 139 L584 105 L598 117 L598 178 L46 178Z" fill="url(#areaGradient)" class="line-visual"/>
+                <path id="chartLine" d="M46 127 L58 113 L69 119 L81 91 L92 99 L105 82 L117 86 L130 65 L143 51 L155 69 L168 83 L181 97 L193 118 L206 108 L219 111 L232 104 L245 110 L258 106 L271 129 L283 147 L296 110 L309 120 L322 97 L334 69 L347 87 L359 52 L372 29 L384 58 L397 45 L409 72 L422 37 L434 81 L447 90 L459 75 L472 92 L484 134 L496 96 L509 111 L521 129 L534 121 L547 106 L559 126 L572 139 L584 105 L598 117" fill="none" stroke="#a38aff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="line-visual"/>
+                <path d="M46 139H598" stroke="#b5a2ff" stroke-width="1" stroke-dasharray="2 4" opacity=".55"/>
+                <path d="M470 25V178" stroke="#b49fff" stroke-width="1" stroke-dasharray="3 4" opacity=".5"/>
+                <circle cx="470" cy="139" r="7" fill="#9472ff" opacity=".28" filter="url(#glow)"/><circle cx="470" cy="139" r="4" fill="#d9cdff" stroke="#8a6bff" stroke-width="2"/>
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <section class="bottom-grid" aria-label="Performanță și recomandări">
+          <article class="card profit-card">
+            <div class="profit-top">
+              <div>
+                <div class="card-title">Profit total <button class="info-button" title="Profit acumulat" aria-label="Despre profit">i</button></div>
+                <div class="profit-number" id="profitTotal">$55,420<span>.45</span></div>
+                <div class="gain-row" style="margin-top:5px"><span class="gain-badge">↑ 7%</span><span>+$9,879.43 anul acesta</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="profit-legend"><span class="legend-item"><i></i>Acțiuni</span><span class="legend-item"><i></i>Obligațiuni</span><span class="legend-item"><i></i>Fonduri</span></div>
+                <button class="icon-btn" id="profitExpand" title="Ecran complet pentru profit" aria-label="Extinde graficul" style="width:34px;height:34px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="profit-chart" id="profitChart">
+              <div class="year-column" data-year="2018"><span class="column-value">$3,279.43</span><div class="stack" style="--h:52%"><span style="height:56%"></span><span style="height:18%"></span><span style="height:12%"></span></div><span class="year-label">2018</span></div>
+              <div class="year-column" data-year="2019"><span class="column-value">$4,455.21</span><div class="stack" style="--h:67%"><span style="height:55%"></span><span style="height:19%"></span><span style="height:13%"></span></div><span class="year-label">2019</span></div>
+              <div class="year-column" data-year="2020"><span class="column-value">$3,544.09</span><div class="stack" style="--h:58%"><span style="height:52%"></span><span style="height:20%"></span><span style="height:13%"></span></div><span class="year-label">2020</span></div>
+              <div class="year-column" data-year="2021"><span class="column-value">$4,830.51</span><div class="stack" style="--h:72%"><span style="height:54%"></span><span style="height:18%"></span><span style="height:14%"></span></div><span class="year-label">2021</span></div>
+              <div class="year-column" data-year="2022"><span class="column-value">$5,252.81</span><div class="stack" style="--h:78%"><span style="height:52%"></span><span style="height:20%"></span><span style="height:14%"></span></div><span class="year-label">2022</span></div>
+              <div class="year-column" data-year="2023"><span class="column-value">$4,769.17</span><div class="stack" style="--h:69%"><span style="height:52%"></span><span style="height:20%"></span><span style="height:13%"></span></div><span class="year-label">2023</span></div>
+              <div class="year-column" data-year="2024"><span class="column-value">$7,122.60</span><div class="stack" style="--h:90%"><span style="height:56%"></span><span style="height:18%"></span><span style="height:15%"></span></div><span class="year-label">2024</span></div>
+            </div>
+          </article>
+
+          <article class="card advisor-card">
+            <div class="advisor-orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="robot-badge" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="white" stroke-width="1.7"><path d="M16 5v4M13 5h6"/><rect x="6" y="10" width="20" height="14" rx="6"/><path d="M10 24v3m12-3v3M6 16H3m26 0h-3"/><circle cx="12" cy="17" r="1.5" fill="white"/><circle cx="20" cy="17" r="1.5" fill="white"/><path d="M12 21h8"/></svg>
+            </div>
+            <div class="advisor-copy">
+              <h2>Investește mai inteligent<br>cu Robo Advisor AI!</h2>
+              <p>Primește administrare automată, informații în timp real și recomandări personalizate.</p>
+            </div>
+            <button class="advisor-btn" id="advisorBtn">Încearcă acum</button>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="popover" id="notificationPopover">
+    <h3>Notificări</h3>
+    <div class="pop-item"><b>Portofoliul tău a crescut</b><br>Activele au avansat cu 2,4% în această săptămână.</div>
+    <div class="pop-item"><b>Raport lunar disponibil</b><br>Rezumatul investițiilor pentru luna aceasta este gata.</div>
+  </div>
+  <div class="popover" id="userPopover">
+    <h3>Contul meu</h3>
+    <div class="pop-item"><b>Investor</b><br>Cont personal · Nivel standard</div>
+    <button class="secondary-btn" id="profileSettings" style="width:100%;height:30px;margin-top:8px;font-size:9px">Preferințe cont</button>
+  </div>
+  <div class="modal-backdrop" id="modalBackdrop">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head"><h2 id="modalTitle">Titlu</h2><button class="icon-btn" id="modalClose" aria-label="Închide" style="width:30px;height:30px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+      <p class="modal-description" id="modalDescription"></p>
+      <form id="modalForm">
+        <div id="modalFields"></div>
+        <div class="modal-actions"><button type="button" class="secondary-btn" id="modalCancel">Anulează</button><button type="submit" class="primary-btn" id="modalSubmit">Continuă</button></div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const shell = $("#shell");
+    const toastEl = $("#toast");
+    let toastTimer;
+    let totalAssets = 325980.65;
+    let totalInvestments = 270560.20;
+    let balance = 25760.98;
+    let chartIsBar = false;
+    let widgetAdded = false;
+    let modalAction = null;
+
+    function money(value, decimals = 2) {
+      return "$" + Number(value).toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
+    }
+    function updateTotals() {
+      const [assetsWhole, assetsCents] = money(totalAssets).split(".");
+      const [investWhole, investCents] = money(totalInvestments).split(".");
+      $("#assetsTotal").innerHTML = `${assetsWhole}<span>.${assetsCents}</span>`;
+      $("#investTotal").innerHTML = `${investWhole}<span>.${investCents}</span>`;
+      $("#balanceAmount").textContent = money(balance);
+      $("#stocksValue").textContent = money(totalAssets * .65);
+      $("#bondsValue").textContent = money(totalAssets * .25);
+      $("#fundsValue").textContent = money(totalAssets * .10);
+    }
+    function openModal(title, description, fieldsHTML, submitLabel, action) {
+      $("#modalTitle").textContent = title;
+      $("#modalDescription").textContent = description;
+      $("#modalFields").innerHTML = fieldsHTML;
+      $("#modalSubmit").textContent = submitLabel;
+      modalAction = action;
+      $("#modalBackdrop").classList.add("open");
+      $("#modalBackdrop").setAttribute("aria-hidden", "false");
+      setTimeout(() => $("#modalFields input, #modalFields select")?.focus(), 40);
+    }
+    function closeModal() {
+      $("#modalBackdrop").classList.remove("open");
+      $("#modalBackdrop").setAttribute("aria-hidden", "true");
+      modalAction = null;
+    }
+    function openTrade(asset = "Acțiuni") {
+      openModal(
+        "Cumpără active",
+        "Alege tipul de activ și suma pe care vrei să o investești. Tranzacția actualizează valorile portofoliului tău.",
+        `<label class="modal-field">Tip de activ<select name="asset"><option ${asset === "Acțiuni" ? "selected" : ""}>Acțiuni</option><option ${asset === "Obligațiuni" ? "selected" : ""}>Obligațiuni</option><option ${asset === "Fonduri mutuale" ? "selected" : ""}>Fonduri mutuale</option></select></label><label class="modal-field">Sumă (USD)<input name="amount" type="number" min="1" step="0.01" placeholder="Ex. 500" required></label><div style="font-size:9px;color:#9c9cac;margin-top:8px">Sold disponibil: <b style="color:#e8e8f1">${money(balance)}</b></div>`,
+        "Confirmă achiziția",
+        (form) => {
+          const amount = Number(form.get("amount"));
+          const selected = form.get("asset");
+          if (!Number.isFinite(amount) || amount <= 0) { showToast("Introdu o sumă validă."); return false; }
+          if (amount > balance) { showToast("Sold insuficient. Adaugă fonduri pentru a continua."); return false; }
+          balance -= amount;
+          totalAssets += amount;
+          totalInvestments += amount;
+          updateTotals();
+          showToast(`${money(amount)} investiți în ${selected.toLowerCase()}.`);
+          return true;
+        }
+      );
+    }
+    function openAddFunds() {
+      openModal(
+        "Adaugă fonduri",
+        "Adaugă fonduri în soldul contului tău pentru a putea investi.",
+        `<label class="modal-field">Sumă (USD)<input name="amount" type="number" min="1" step="0.01" placeholder="Ex. 1.000" required></label><div style="font-size:9px;color:#9c9cac">Sold curent: <b style="color:#e8e8f1">${money(balance)}</b></div>`,
+        "Adaugă fonduri",
+        (form) => {
+          const amount = Number(form.get("amount"));
+          if (!Number.isFinite(amount) || amount <= 0) { showToast("Introdu o sumă validă."); return false; }
+          balance += amount;
+          updateTotals();
+          showToast(`${money(amount)} adăugați în sold.`);
+          return true;
+        }
+      );
+    }
+
+    $("#modalClose").addEventListener("click", closeModal);
+    $("#modalCancel").addEventListener("click", closeModal);
+    $("#modalBackdrop").addEventListener("click", e => { if (e.target === $("#modalBackdrop")) closeModal(); });
+    $("#modalForm").addEventListener("submit", e => {
+      e.preventDefault();
+      if (modalAction && modalAction(new FormData(e.currentTarget)) !== false) closeModal();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        closeModal();
+        $("#notificationPopover").classList.remove("open");
+        $("#userPopover").classList.remove("open");
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        $("#stockSearch").focus();
+      }
+    });
+
+    $("#buyAsset").addEventListener("click", () => openTrade());
+    $$(".asset-row").forEach(row => row.addEventListener("click", () => openTrade(row.dataset.asset)));
+    $("#balanceButton").addEventListener("click", openAddFunds);
+    $("#addFunds").addEventListener("click", openAddFunds);
+
+    $("#transferBtn").addEventListener("click", () => {
+      openModal(
+        "Transferă fonduri",
+        "Transferă bani către un cont conectat. Această acțiune actualizează soldul disponibil.",
+        `<label class="modal-field">Cont destinatar<select name="recipient"><option>Cont bancar principal ·· 4821</option><option>Portofel Chainx ·· 0914</option></select></label><label class="modal-field">Sumă (USD)<input name="amount" type="number" min="1" step="0.01" placeholder="Ex. 250" required></label>`,
+        "Confirmă transferul",
+        form => {
+          const amount = Number(form.get("amount"));
+          if (!Number.isFinite(amount) || amount <= 0) { showToast("Introdu o sumă validă."); return false; }
+          if (amount > balance) { showToast("Sold insuficient pentru acest transfer."); return false; }
+          balance -= amount;
+          updateTotals();
+          showToast(`${money(amount)} transferați cu succes.`);
+          return true;
+        }
+      );
+    });
+
+    $("#refreshBtn").addEventListener("click", () => {
+      shell.classList.add("flash");
+      setTimeout(() => shell.classList.remove("flash"), 400);
+      showToast("Datele portofoliului au fost actualizate.");
+    });
+    $("#captureBtn").addEventListener("click", () => {
+      shell.classList.add("flash");
+      setTimeout(() => shell.classList.remove("flash"), 400);
+      showToast("Captură de ecran pregătită.");
+    });
+    $("#fullscreenBtn").addEventListener("click", () => {
+      shell.classList.toggle("fullscreen");
+      $("#fullscreenBtn").title = shell.classList.contains("fullscreen") ? "Ieși din ecran complet" : "Ecran complet";
+      showToast(shell.classList.contains("fullscreen") ? "Vizualizare pe tot ecranul." : "Vizualizare normală.");
+    });
+    $("#profitExpand").addEventListener("click", () => {
+      const card = $(".profit-card");
+      card.classList.toggle("profit-expanded");
+      if (card.classList.contains("profit-expanded")) {
+        card.style.position = "fixed";
+        card.style.inset = "12% 12%";
+        card.style.zIndex = "15";
+        card.style.boxShadow = "0 20px 80px rgba(0,0,0,.6)";
+        showToast("Graficul de profit este extins.");
+      } else {
+        card.removeAttribute("style");
+        card.style.cssText = "";
+        showToast("Graficul de profit a revenit la dimensiunea normală.");
+      }
+    });
+
+    $("#themeSwitch").addEventListener("click", e => {
+      const isLight = shell.classList.toggle("light-theme");
+      e.currentTarget.classList.toggle("off", isLight);
+      e.currentTarget.setAttribute("aria-pressed", String(!isLight));
+      $(".theme-label").textContent = isLight ? "Mod luminos" : "Mod întunecat";
+      showToast(isLight ? "Tema luminoasă activată." : "Tema întunecată activată.");
+    });
+
+    $("#collapseSide").addEventListener("click", () => {
+      shell.classList.toggle("sidebar-collapsed");
+      $("#sidebar").classList.toggle("collapsed");
+      showToast($("#sidebar").classList.contains("collapsed") ? "Meniul a fost restrâns." : "Meniul este extins.");
+    });
+
+    $$(".nav-btn[data-page]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.id === "portfolioNav") {
+          const sub = $("#portfolioSubnav");
+          const hidden = sub.style.maxHeight === "0px";
+          sub.style.maxHeight = hidden ? "150px" : "0px";
+          $("#portfolioChevron").classList.toggle("closed", !hidden);
+        }
+        $$(".nav-btn[data-page]").forEach(item => item.classList.remove("active"));
+        btn.classList.add("active");
+        $("#pageTitle").textContent = btn.dataset.page;
+        $("#pageSubtitle").textContent = btn.dataset.page === "Dashboard"
+          ? "Bine ai revenit! Vezi cum evoluează investițiile tale."
+          : `Rezumatul tău pentru ${btn.dataset.page.toLowerCase()} — date actualizate în timp real.`;
+      });
+    });
+    $$("#portfolioSubnav button").forEach(btn => btn.addEventListener("click", () => {
+      $$(".nav-btn[data-page]").forEach(item => item.classList.remove("active"));
+      $("#portfolioNav").classList.add("active");
+      $("#pageTitle").textContent = btn.dataset.page;
+      $("#pageSubtitle").textContent = `Detalii și evoluție pentru ${btn.dataset.page.toLowerCase()} din portofoliul tău.`;
+    }));
+
+    $("#stockSearch").addEventListener("input", e => {
+      const query = e.target.value.trim().toUpperCase();
+      let matches = 0;
+      $$(".ticker").forEach(item => {
+        const match = !query || item.dataset.symbol.includes(query);
+        item.style.display = match ? "flex" : "none";
+        if (match) matches++;
+      });
+      if (query && !matches) showToast(`Nu am găsit simbolul „${query}”.`);
+    });
+    $("#stockSearch").addEventListener("keydown", e => {
+      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+        const match = $$(".ticker").find(item => item.dataset.symbol === e.currentTarget.value.trim().toUpperCase());
+        if (match) showToast(`${match.dataset.symbol} — simbol selectat.`);
+      }
+    });
+    $$(".ticker").forEach(item => item.addEventListener("click", () => openTrade("Acțiuni")));
+    $("#tickerNext").addEventListener("click", () => {
+      const track = $("#tickerTrack");
+      track.scrollBy({ left: 180, behavior: "smooth" });
+      showToast("Mai multe simboluri disponibile în lista de piață.");
+    });
+    $("#marketToggle").addEventListener("click", () => {
+      const open = $("#marketText").textContent.includes("deschisă");
+      $("#marketText").textContent = open ? "Piața este închisă" : "Piața este deschisă";
+      $("#marketDot").style.background = open ? "#f08a68" : "#a58bff";
+      showToast(open ? "Piața este marcată ca închisă." : "Piața este marcată ca deschisă.");
+    });
+    $("#marketView").addEventListener("click", () => {
+      $("#stockSearch").focus();
+      $("#stockSearch").value = "";
+      $("#stockSearch").dispatchEvent(new Event("input"));
+      showToast("Afișezi toate simbolurile urmărite.");
+    });
+
+    $("#timeRange").addEventListener("change", e => {
+      const labels = { all: "anul acesta", "1y": "în ultimul an", "6m": "în ultimele 6 luni", "1m": "în ultima lună" };
+      const factors = { all: 1, "1y": .76, "6m": .48, "1m": .18 };
+      const factor = factors[e.target.value];
+      $("#investGain").textContent = `+${money(54112.04 * factor).slice(1)} ${labels[e.target.value]}`;
+      $("#assetGain").textContent = `+${money(39117.67 * factor).slice(1)} ${labels[e.target.value]}`;
+      $("#chartTip .tip-year").textContent = e.target.value === "all" ? "2024" : e.target.value === "1y" ? "Ultimul an" : e.target.value === "6m" ? "Ultimele 6 luni" : "Ultima lună";
+      showToast(`Interval selectat: ${e.target.options[e.target.selectedIndex].text.replace("▣", "").trim()}.`);
+    });
+    $("#chartSettings").addEventListener("click", e => {
+      chartIsBar = !chartIsBar;
+      $("#chartBars").style.opacity = chartIsBar ? ".95" : ".6";
+      $$(".line-visual").forEach(el => el.style.opacity = chartIsBar ? ".18" : "1");
+      e.currentTarget.classList.toggle("selected", chartIsBar);
+      $("#lineMode").classList.toggle("selected", !chartIsBar);
+      showToast(chartIsBar ? "Vizualizare cu bare activată." : "Vizualizare linie activată.");
+    });
+    $("#lineMode").addEventListener("click", () => {
+      chartIsBar = false;
+      $("#chartBars").style.opacity = ".6";
+      $$(".line-visual").forEach(el => el.style.opacity = "1");
+      $("#chartSettings").classList.remove("selected");
+      $("#lineMode").classList.add("selected");
+      showToast("Vizualizare linie activată.");
+    });
+
+    $("#chartWrap").addEventListener("mousemove", e => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const year = 2018 + Math.round(ratio * 8);
+      const tip = $("#chartTip");
+      tip.style.right = "auto";
+      tip.style.left = `${Math.min(rect.width - 132, Math.max(35, e.clientX - rect.left + 8))}px`;
+      tip.style.top = `${Math.max(0, Math.min(rect.height - 65, e.clientY - rect.top - 30))}px`;
+      tip.querySelector(".tip-year").textContent = year;
+    });
+    $("#chartWrap").addEventListener("mouseleave", () => {
+      $("#chartTip").style.left = "";
+      $("#chartTip").style.right = "13%";
+      $("#chartTip").style.top = "12px";
+      $("#chartTip .tip-year").textContent = "2024";
+    });
+    $$(".year-column").forEach(col => col.addEventListener("click", () => showToast(`Profitul pentru ${col.dataset.year}: ${$(".column-value", col).textContent}.`)));
+
+    $("#addWidget").addEventListener("click", () => {
+      if (widgetAdded) {
+        showToast("Widgetul „Performanță” este deja pe tabloul tău.");
+        return;
+      }
+      widgetAdded = true;
+      const badge = document.createElement("span");
+      badge.className = "added-widget";
+      badge.textContent = "↗ Performanță +12%";
+      $(".invest-card").appendChild(badge);
+      $("#addWidget").innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Widget adăugat';
+      showToast("Widgetul de performanță a fost adăugat.");
+    });
+
+    $("#notificationBtn").addEventListener("click", e => {
+      const pop = $("#notificationPopover");
+      $("#userPopover").classList.remove("open");
+      pop.classList.toggle("open");
+      const r = e.currentTarget.getBoundingClientRect();
+      pop.style.top = `${r.bottom + 8}px`;
+      pop.style.left = `${Math.max(12, r.left - 105)}px`;
+    });
+    $("#userButton").addEventListener("click", e => {
+      const pop = $("#userPopover");
+      $("#notificationPopover").classList.remove("open");
+      pop.classList.toggle("open");
+      const r = e.currentTarget.getBoundingClientRect();
+      pop.style.top = `${r.bottom + 8}px`;
+      pop.style.right = `${Math.max(12, window.innerWidth - r.right)}px`;
+      pop.style.left = "auto";
+    });
+    document.addEventListener("click", e => {
+      if (!e.target.closest("#notificationBtn") && !e.target.closest("#notificationPopover")) $("#notificationPopover").classList.remove("open");
+      if (!e.target.closest("#userButton") && !e.target.closest("#userPopover")) $("#userPopover").classList.remove("open");
+    });
+    $("#profileSettings").addEventListener("click", () => {
+      $("#userPopover").classList.remove("open");
+      $("#settingsBtn").click();
+    });
+
+    $("#upgradeBtn").addEventListener("click", () => openModal(
+      "Chainx Pro",
+      "Deblochează instrumente avansate pentru a-ți urmări și gestiona investițiile.",
+      `<div style="padding:12px;border-radius:10px;background:#211c35;border:1px solid #4c3a79;color:#d9d0f0;font-size:10px;line-height:1.8"><b>Planul Pro include</b><br>• Analiză avansată a portofoliului<br>• Alerte personalizate de preț<br>• Rapoarte și informații AI</div>`,
+      "Activează perioada de probă",
+      () => { showToast("Perioada de probă Chainx Pro a fost activată."); return true; }
+    ));
+    $("#advisorBtn").addEventListener("click", () => openModal(
+      "Robo Advisor AI",
+      "Creează un profil pentru a primi sugestii de investiții potrivite obiectivelor tale.",
+      `<label class="modal-field">Obiectiv principal<select name="goal"><option>Creștere pe termen lung</option><option>Venit stabil</option><option>Economisire pentru un obiectiv</option></select></label><label class="modal-field">Orizont de timp<select name="horizon"><option>5+ ani</option><option>2–5 ani</option><option>Sub 2 ani</option></select></label>`,
+      "Generează recomandări",
+      form => { showToast(`Profil creat: ${form.get("goal").toLowerCase()}.`); return true; }
+    ));
+    $("#helpBtn").addEventListener("click", () => openModal(
+      "Ajutor și suport",
+      "Găsește răspunsuri rapide sau contactează echipa Chainx.",
+      `<div style="padding:11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;margin-bottom:9px;font-size:10px"><b>Centru de ajutor</b><br><span style="color:#aaaab8">Ghiduri despre portofoliu, tranzacții și cont.</span></div><label class="modal-field">Mesaj pentru echipa noastră<input name="message" placeholder="Scrie întrebarea ta..." required></label>`,
+      "Trimite mesajul",
+      form => { showToast("Mesajul tău a fost trimis echipei de suport."); return true; }
+    ));
+    $("#settingsBtn").addEventListener("click", () => openModal(
+      "Setări",
+      "Gestionează preferințele de afișare ale tabloului tău.",
+      `<label class="modal-field">Monedă de afișare<select name="currency"><option>USD — dolar american</option><option>EUR — euro</option><option>RON — leu românesc</option></select></label><label class="modal-field">Actualizare date<select name="refresh"><option>În timp real</option><option>La fiecare 5 minute</option><option>Manual</option></select></label>`,
+      "Salvează preferințele",
+      form => { showToast(`Preferințe salvate · ${form.get("currency").slice(0,3)}.`); return true; }
+    ));
+
+    updateTotals();
+  </script>
+</body>
+</html>
